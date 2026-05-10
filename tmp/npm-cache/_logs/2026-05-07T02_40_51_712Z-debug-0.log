@@ -1,0 +1,23 @@
+0 verbose cli D:\node.js1\node.exe D:\node.js1\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.11.0
+2 info using node@v24.14.1
+3 silly config load:file:D:\node.js1\node_modules\npm\npmrc
+4 silly config load:file:D:\biushe\.npmrc
+5 silly config load:file:C:\Users\贺小双\.npmrc
+6 silly config load:file:D:\node.js1\node_global\etc\npmrc
+7 verbose title npm exec playwright screenshot --channel chrome --viewport-size 1600,900 file:///D:/biushe/output/ppt_visual_scheme/scheme.html?slide=chapter D:\biushe\output\ppt_visual_scheme\chapter.png
+8 verbose argv "exec" "--yes" "--" "playwright" "screenshot" "--channel" "chrome" "--viewport-size" "1600,900" "file:///D:/biushe/output/ppt_visual_scheme/scheme.html?slide=chapter" "D:\\biushe\\output\\ppt_visual_scheme\\chapter.png"
+9 verbose logfile logs-max:10 dir:D:\biushe\tmp\npm-cache\_logs\2026-05-07T02_40_51_712Z-
+10 verbose logfile D:\biushe\tmp\npm-cache\_logs\2026-05-07T02_40_51_712Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+13 silly logfile done cleaning log files
+14 http fetch GET 200 https://registry.npmmirror.com/playwright 757ms (cache revalidated)
+15 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+16 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+17 verbose cwd D:\biushe
+18 verbose os Windows_NT 10.0.26200
+19 verbose node v24.14.1
+20 verbose npm  v11.11.0
+21 verbose exit 0
+22 info ok

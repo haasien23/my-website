@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>基于集群的多任务协同态势感知平台</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero card">
+        <div class="hero-copy">
+          <p class="eyebrow">Clustered Awareness Experiment Console</p>
+          <h1>基于集群的多任务协同态势感知平台</h1>
+          <p class="hero-text">
+            面向复杂真实环境下的无人机集群协同感知实验。平台同时考虑动态目标、障碍物、感知范围、
+            通信链路、天气扰动、故障扰动与绕障最短路，并对比 RADS 动态子群、随机派遣、全量派遣三种策略。
+          </p>
+          <div class="hero-tags">
+            <span>动态无人机子群选择</span>
+            <span>障碍规避最短路径</span>
+            <span>多任务并行感知</span>
+            <span>三策略效果对照</span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <div class="session-card">
+            <span class="session-label">实验会话状态</span>
+            <strong id="progressLabel">准备就绪</strong>
+            <span id="progressPercent" class="session-percent">0%</span>
+          </div>
+          <div class="action-row">
+            <button id="runBtn" class="btn primary">运行仿真</button>
+            <button id="resetBtn" class="btn">恢复默认</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="card progress-card">
+        <div class="progress-top">
+          <div>
+            <span class="block-label">推进步数</span>
+            <strong id="currentStepInfo">当前步数 0 / 0</strong>
+          </div>
+          <div>
+            <span class="block-label">回放状态</span>
+            <strong id="playbackInfo">第 0 帧 / 共 0 帧</strong>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-fill"></div>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <aside class="control-panel card">
+          <div class="control-head">
+            <h2>场景配置器</h2>
+            <p>
+              修改参数后重新运行，平台会基于当前配置重新生成复杂场景。即使基础种子相同，每次点击运行也会注入新的运行时随机扰动。
+            </p>
+          </div>
+
+          <section class="config-group">
+            <h3>运行模式</h3>
+            <div class="mode-selector" id="executionModeGroup">
+              <label class="mode-option">
+                <input type="radio" name="execution_mode" value="compare_all" checked />
+                <span>三算法对比</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="execution_mode" value="smart_only" />
+                <span>仅 RADS</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="execution_mode" value="random_only" />
+                <span>仅随机派遣</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="execution_mode" value="full_only" />
+                <span>仅全量派遣</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="config-group">
+            <h3>集群与任务</h3>
+            <label><span>随机种子</span><input id="seed" type="number" /></label>
+            <label><span>无人机数量</span><input id="drone_count" type="number" /></label>
+            <label><span>目标数量</span><input id="target_count" type="number" /></label>
+            <label><span>障碍物数量</span><input id="obstacle_count" type="number" /></label>
+            <label><span>仿真步数</span><input id="run_steps" type="number" /></label>
+          </section>
+
+          <section class="config-group">
+            <h3>感知与通信</h3>
+            <label><span>感知半径</span><input id="sensor_range" type="number" /></label>
+            <label><span>侦察视场角</span><input id="sensor_fov_deg" type="number" /></label>
+            <label><span>通信半径</span><input id="comm_range" type="number" /></label>
+            <label><span>传感噪声</span><input id="sensor_noise" type="number" step="0.5" /></label>
+            <label><span>链路丢包率</span><input id="packet_loss_rate" type="number" step="0.01" /></label>
+            <label><span>链路延迟步数</span><input id="comm_delay_steps" type="number" /></label>
+            <label><span>融合半径</span><input id="merge_radius" type="number" /></label>
+            <label><span>最小确认观测</span><input id="min_observations" type="number" /></label>
+            <label><span>随机派机比例</span><input id="dispatch_ratio" type="number" step="0.05" /></label>
+          </section>
+
+          <section class="config-group">
+            <h3>运动与扰动</h3>
+            <label>
+              <span>天气预设</span>
+              <select id="weather_preset">
+                <option value="clear">晴空</option>
+                <option value="haze">薄雾</option>
+                <option value="rain">降雨</option>
+                <option value="storm">雷暴</option>
+              </select>
+            </label>
+            <label><span>无人机速度</span><input id="drone_speed" type="number" /></label>
+            <label><span>目标机动速度</span><input id="target_speed" type="number" /></label>
+            <label><span>故障率</span><input id="fault_rate" type="number" step="0.01" /></label>
+          </section>
+
+          <section class="config-note">
+            <h3>实验说明</h3>
+            <ul>
+              <li>RADS 会动态计算任务需求并选择感知无人机子群，不是固定参数派机。</li>
+              <li>随机基线会动态决定派机规模，但具体派出的无人机保持随机选择。</li>
+              <li>全量基线会派出全部可用无人机，用于观察极限感知能力与能耗代价。</li>
+              <li>当前模型还引入了侦察视场角、链路丢包与时延、天气扰动、融合半径和最小确认观测，更接近真实侦察感知过程。</li>
+              <li>严格成功率要求“确认数量、定位误差、一致性”同时达标；定位达标率只统计误差是否落入阈值。</li>
+            </ul>
+          </section>
+        </aside>
+
+        <main class="main-stage">
+          <section id="strategyBand" class="strategy-band">
+            <article class="strategy-card smart" data-strategy-card="smart">
+              <div class="strategy-head">
+                <div>
+                  <span class="strategy-name">RADS 动态子群</span>
+                  <small id="smartMeta">等待仿真</small>
+                </div>
+                <span class="badge accent">核心算法</span>
+              </div>
+              <div class="strategy-grid">
+                <div><span>严格成功率</span><strong id="smartSuccess">0%</strong></div>
+                <div><span>定位达标率</span><strong id="smartCoverage">0%</strong></div>
+                <div><span>平均误差</span><strong id="smartError">--</strong></div>
+                <div><span>累计能耗</span><strong id="smartEnergy">--</strong></div>
+                <div><span>平均派机</span><strong id="smartDispatch">--</strong></div>
+              </div>
+            </article>
+
+            <article class="strategy-card random" data-strategy-card="random">
+              <div class="strategy-head">
+                <div>
+                  <span class="strategy-name">随机派遣</span>
+                  <small id="randomMeta">等待仿真</small>
+                </div>
+                <span class="badge random">基线一</span>
+              </div>
+              <div class="strategy-grid">
+                <div><span>严格成功率</span><strong id="randomSuccess">0%</strong></div>
+                <div><span>定位达标率</span><strong id="randomCoverage">0%</strong></div>
+                <div><span>平均误差</span><strong id="randomError">--</strong></div>
+                <div><span>累计能耗</span><strong id="randomEnergy">--</strong></div>
+                <div><span>平均派机</span><strong id="randomDispatch">--</strong></div>
+              </div>
+            </article>
+
+            <article class="strategy-card full" data-strategy-card="full">
+              <div class="strategy-head">
+                <div>
+                  <span class="strategy-name">全量派遣</span>
+                  <small id="fullMeta">等待仿真</small>
+                </div>
+                <span class="badge full">基线二</span>
+              </div>
+              <div class="strategy-grid">
+                <div><span>严格成功率</span><strong id="fullSuccess">0%</strong></div>
+                <div><span>定位达标率</span><strong id="fullCoverage">0%</strong></div>
+                <div><span>平均误差</span><strong id="fullError">--</strong></div>
+                <div><span>累计能耗</span><strong id="fullEnergy">--</strong></div>
+                <div><span>平均派机</span><strong id="fullDispatch">--</strong></div>
+              </div>
+            </article>
+          </section>
+
+          <section class="insight-grid">
+            <article class="card panel battlefield-panel">
+              <div class="panel-head">
+                <div>
+                  <h2 id="battlefieldTitle">RADS 协同态势沙盘</h2>
+                  <p id="battlefieldDesc">主视图展示 3D 侦察态势、障碍遮挡阴影、动态子群选择与目标融合结果。</p>
+                </div>
+                <span id="frameLabel" class="muted-tag">回放帧 0</span>
+              </div>
+              <canvas id="smartCanvas" width="920" height="540"></canvas>
+              <p class="scene-tip">3D recon view: drag to rotate, wheel to zoom, double-click to reset the camera. Click the window to expand.</p>
+
+              <div class="legend-inline">
+                <span><i class="legend-chip drone"></i>执行无人机</span>
+                <span><i class="legend-chip offline"></i>故障节点</span>
+                <span><i class="legend-chip target"></i>动态目标</span>
+                <span><i class="legend-chip estimate"></i>融合位置</span>
+                <span><i class="legend-chip obstacle"></i>障碍物</span>
+                <span><i class="legend-chip link"></i>派机链路</span>
+                <span><i class="legend-chip trail"></i>轨迹尾迹</span>
+                <span><i class="legend-chip shadow"></i>遮挡阴影</span>
+              </div>
+
+              <div class="playback-controls">
+                <button id="prevFrameBtn" class="btn">上一帧</button>
+                <button id="playBtn" class="btn">播放回放</button>
+                <button id="nextFrameBtn" class="btn">下一帧</button>
+              </div>
+
+              <div class="playback-tools">
+                <button id="topViewBtn" class="btn subtle">俯视视角</button>
+                <button id="resetViewBtn" class="btn subtle">默认视角</button>
+                <button id="openCompareModalBtn" class="btn subtle">三视图大对比</button>
+                <button id="clearFocusBtn" class="btn subtle" disabled>取消目标追踪</button>
+                <button id="exportCsvBtn" class="btn subtle" disabled>导出实验 CSV</button>
+                <span id="focusInfo" class="focus-pill">当前未追踪目标</span>
+              </div>
+
+              <div class="slider-row">
+                <input id="frameSlider" type="range" min="0" max="0" step="1" value="0" />
+              </div>
+
+              <div class="battlefield-extra">
+                <section class="battlefield-mini-card">
+                  <div class="battlefield-mini-head">
+                    <div>
+                      <h3>当前帧简报</h3>
+                      <p id="briefSubtitle">等待仿真开始后生成当前帧态势摘要。</p>
+                    </div>
+                    <span id="briefModeTag" class="muted-tag">待命</span>
+                  </div>
+                  <div class="battlefield-mini-metrics">
+                    <div class="battlefield-mini-metric">
+                      <span>执行无人机</span>
+                      <strong id="briefAssignedCount">--</strong>
+                    </div>
+                    <div class="battlefield-mini-metric">
+                      <span>故障节点</span>
+                      <strong id="briefFailedCount">--</strong>
+                    </div>
+                    <div class="battlefield-mini-metric">
+                      <span>已观测目标</span>
+                      <strong id="briefObservedCount">--</strong>
+                    </div>
+                    <div class="battlefield-mini-metric">
+                      <span>已确认目标</span>
+                      <strong id="briefConfirmedCount">--</strong>
+                    </div>
+                    <div class="battlefield-mini-metric">
+                      <span>严格成功</span>
+                      <strong id="briefSuccessCount">--</strong>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="battlefield-mini-card">
+                  <div class="battlefield-mini-head">
+                    <div>
+                      <h3>目标追踪解析</h3>
+                      <p id="focusSummaryText">点击下方表格中的某个目标后，这里会持续展示该目标在三种策略下的派机与感知差异。</p>
+                    </div>
+                    <span id="focusTargetTag" class="muted-tag">未锁定</span>
+                  </div>
+                  <div id="focusStrategyCards" class="focus-strategy-grid"></div>
+                </section>
+
+                <section class="battlefield-mini-card">
+                  <div class="battlefield-mini-head">
+                    <div>
+                      <h3>当前派机热点</h3>
+                      <p>按当前主视图策略的派机规模、优先级和目标不确定性排序。点击条目可直接开始追踪。</p>
+                    </div>
+                  </div>
+                  <div id="hotTargetList" class="hot-target-list"></div>
+                </section>
+              </div>
+            </article>
+
+            <div class="observer-column">
+              <article id="timelinePanel" class="card panel observer-panel timeline-panel">
+                <div class="panel-head">
+                  <div>
+                    <h2>策略收益时间线</h2>
+                    <p>按步展示三种策略的严格成功率变化。</p>
+                  </div>
+                </div>
+                <canvas id="timelineCanvas" width="620" height="250"></canvas>
+                <div class="timeline-legend">
+                  <span><i class="dot blue"></i>RADS</span>
+                  <span><i class="dot orange"></i>随机派遣</span>
+                  <span><i class="dot slate"></i>全量派遣</span>
+                </div>
+              </article>
+
+              <article id="baselinePanel" class="card panel observer-panel baseline-panel">
+                <div class="panel-head">
+                  <div>
+                    <h2>基线观察窗</h2>
+                    <p>右侧用于同步观察两种对比策略在同一复杂 3D 场景下的态势演化。</p>
+                  </div>
+                </div>
+                <div class="mini-scenes">
+                  <div class="mini-scene">
+                    <h3>随机派遣</h3>
+                    <canvas id="randomCanvas" width="330" height="220"></canvas>
+                    <p class="mini-tip">拖拽旋转，滚轮缩放，双击复位视角，点击窗口可单独展开。</p>
+                  </div>
+                  <div class="mini-scene">
+                    <h3>全量派遣</h3>
+                    <canvas id="fullCanvas" width="330" height="220"></canvas>
+                    <p class="mini-tip">拖拽旋转，滚轮缩放，双击复位视角，点击窗口可单独展开。</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="card panel observer-panel summary-panel">
+                <div class="panel-head">
+                  <div>
+                    <h2>实验结论摘要</h2>
+                    <p>可直接用于论文中的结果分析说明。</p>
+                  </div>
+                </div>
+                <p id="comparisonText" class="comparison-text">
+                  点击“运行仿真”后，平台将逐步推进复杂场景，并自动生成三策略精度与能耗对比结论。
+                </p>
+                <div class="status-legend status-legend-main">
+                  <span><b>严格成功</b>：确认数、一致性和误差同时达标</span>
+                  <span><b>达标未确认</b>：误差达标，但确认数还不够</span>
+                  <span><b>已观测未达标</b>：已经观测到目标，但误差仍偏大</span>
+                  <span><b>未形成有效观测</b>：当前帧没有形成可用结果</span>
+                </div>
+                <div class="summary-explainers">
+                  <section class="summary-explainer-card">
+                    <h3>指标释义</h3>
+                    <div id="metricGlossaryMain" class="summary-explainer-list"></div>
+                  </section>
+                  <section class="summary-explainer-card">
+                    <h3>当前运行解读</h3>
+                    <div id="runFactsMain" class="summary-explainer-list"></div>
+                  </section>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section id="analysisGrid" class="analysis-grid">
+            <article class="card panel">
+              <div class="panel-head">
+                <div>
+                  <h2>任务级精度对照</h2>
+                  <p>比较每个目标在三种策略下的定位误差表现。</p>
+                </div>
+              </div>
+              <div class="table-wrap compact">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>目标</th>
+                      <th>RADS 误差</th>
+                      <th>随机误差</th>
+                      <th>全量误差</th>
+                      <th>最佳方法</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comparisonRows"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="card panel">
+              <div class="panel-head">
+                <div>
+                  <h2>多任务对照明细</h2>
+                  <p>统计派机规模、感知结果和融合误差，方便实验分析与答辩展示。</p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>目标</th>
+                      <th>优先级</th>
+                      <th>不确定半径</th>
+                      <th>RADS 派机</th>
+                      <th>随机派机</th>
+                      <th>全量派机</th>
+                      <th>RADS 状态</th>
+                      <th>随机状态</th>
+                      <th>全量状态</th>
+                      <th>RADS 误差</th>
+                      <th>随机误差</th>
+                      <th>全量误差</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailRows"></tbody>
+                </table>
+              </div>
+            </article>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div id="sceneModal" class="scene-modal hidden" aria-hidden="true">
+      <div class="scene-modal-backdrop" id="sceneModalBackdrop"></div>
+      <section class="scene-modal-card">
+        <div class="scene-modal-head">
+          <div>
+            <h2 id="sceneModalTitle">单独视图</h2>
+            <p id="sceneModalHint">可在此窗口中单独观察当前策略的 3D 态势回放。</p>
+          </div>
+          <div class="scene-modal-actions">
+            <button id="sceneModalTopBtn" class="btn subtle">俯视视角</button>
+            <button id="sceneModalResetViewBtn" class="btn subtle">默认视角</button>
+            <button id="sceneModalClose" class="btn">关闭</button>
+          </div>
+        </div>
+        <canvas id="expandedSceneCanvas" width="1280" height="760"></canvas>
+        <p class="scene-tip">拖拽旋转，滚轮缩放，双击复位视角，按 Esc 可关闭该窗口。</p>
+      </section>
+    </div>
+
+    <div id="compareModal" class="scene-modal hidden" aria-hidden="true">
+      <div class="scene-modal-backdrop" id="compareModalBackdrop"></div>
+      <section class="scene-modal-card scene-modal-card wide">
+        <div class="scene-modal-head">
+          <div>
+            <h2>三算法大视图对比</h2>
+            <p>并排观察 RADS、随机派遣、全量派遣在同一回放帧下的 3D 态势。</p>
+          </div>
+          <div class="scene-modal-actions">
+            <button id="compareModalTopBtn" class="btn subtle">俯视视角</button>
+            <button id="compareModalResetViewBtn" class="btn subtle">默认视角</button>
+            <button id="compareModalClose" class="btn">关闭</button>
+          </div>
+        </div>
+        <div class="compare-modal-grid">
+          <section class="compare-modal-pane">
+            <h3>RADS 动态子群</h3>
+            <canvas id="compareSmartCanvas" width="960" height="560"></canvas>
+          </section>
+          <section class="compare-modal-pane">
+            <h3>随机派遣</h3>
+            <canvas id="compareRandomCanvas" width="960" height="560"></canvas>
+          </section>
+          <section class="compare-modal-pane">
+            <h3>全量派遣</h3>
+            <canvas id="compareFullCanvas" width="960" height="560"></canvas>
+          </section>
+        </div>
+        <p class="scene-tip">三个视图都支持拖拽旋转、滚轮缩放和双击复位视角。</p>
+      </section>
+    </div>
+
+    <script>
+      window.DEFAULT_CONFIG = {{ default_config_json | safe }};
+    </script>
+    <script type="module" src="/static/scene3d-webgl.mjs"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

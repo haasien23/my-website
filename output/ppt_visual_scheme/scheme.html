@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>江西理工大学本科毕设答辩PPT视觉方案</title>
+  <style>
+    :root {
+      --navy: #0c2f5c;
+      --navy-2: #164475;
+      --red: #9f3129;
+      --red-soft: #b14a40;
+      --gold: #d5a75a;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d8dee8;
+      --paper: #f5f7fb;
+      --panel: #ffffff;
+      --soft-blue: #edf3fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #e9edf5;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", Arial, sans-serif;
+      color: var(--ink);
+    }
+
+    .board {
+      width: 1680px;
+      margin: 0 auto;
+      padding: 46px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .slide {
+      position: relative;
+      width: 512px;
+      height: 288px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
+      border: 1px solid #d7dde8;
+      box-shadow: 0 10px 28px rgba(15, 35, 65, 0.12);
+    }
+
+    body.single {
+      background: #f0f3f8;
+    }
+
+    body.single .board {
+      width: 1600px;
+      padding: 0;
+      display: block;
+    }
+
+    body.single .slide {
+      display: none;
+      width: 1600px;
+      height: 900px;
+      border: 0;
+      box-shadow: none;
+    }
+
+    body.single[data-slide="cover"] .cover,
+    body.single[data-slide="agenda"] .agenda,
+    body.single[data-slide="chapter"] .chapter,
+    body.single[data-slide="framework"] .framework,
+    body.single[data-slide="results"] .results,
+    body.single[data-slide="summary"] .summary {
+      display: block;
+    }
+
+    .logo {
+      object-fit: contain;
+      display: block;
+    }
+
+    .header {
+      position: absolute;
+      left: 30px;
+      top: 20px;
+      right: 30px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .header .logo { width: 118px; height: 28px; }
+
+    .header .meta {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .footer {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      bottom: 18px;
+      height: 16px;
+      border-top: 1px solid rgba(216, 222, 232, 0.88);
+      color: #8a94a3;
+      font-size: 9px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .title {
+      margin: 0;
+      color: var(--navy);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .eyebrow {
+      color: var(--red);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .thin-red {
+      width: 70px;
+      height: 3px;
+      background: var(--red);
+      margin-top: 10px;
+    }
+
+    .motif {
+      position: absolute;
+      inset: auto 18px 18px auto;
+      width: 210px;
+      height: 140px;
+      opacity: 0.16;
+      background:
+        radial-gradient(circle at 20% 70%, var(--navy) 0 2px, transparent 3px),
+        radial-gradient(circle at 44% 44%, var(--red) 0 2px, transparent 3px),
+        radial-gradient(circle at 66% 62%, var(--navy) 0 2px, transparent 3px),
+        radial-gradient(circle at 84% 28%, var(--red) 0 2px, transparent 3px),
+        linear-gradient(28deg, transparent 22%, var(--navy) 23% 24%, transparent 25%),
+        linear-gradient(342deg, transparent 32%, var(--navy) 33% 34%, transparent 35%),
+        linear-gradient(18deg, transparent 44%, var(--red) 45% 46%, transparent 47%);
+    }
+
+    .cover .brand {
+      position: absolute;
+      top: 26px;
+      left: 34px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cover .brand .logo {
+      width: 190px;
+      height: 46px;
+    }
+
+    .cover .tag {
+      font-size: 11px;
+      color: var(--muted);
+      border-left: 2px solid var(--red);
+      padding-left: 10px;
+      line-height: 1.4;
+    }
+
+    .cover .main-title {
+      position: absolute;
+      left: 54px;
+      top: 108px;
+      width: 390px;
+    }
+
+    .cover h1 {
+      font-size: 27px;
+      line-height: 1.28;
+      margin: 0;
+      color: var(--navy);
+      letter-spacing: 0;
+    }
+
+    .cover .subtitle {
+      margin-top: 16px;
+      width: 326px;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #4b5563;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .cover .corner {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 130px;
+      height: 130px;
+      background: linear-gradient(135deg, rgba(159, 49, 41, 0.12), transparent 65%);
+      clip-path: polygon(100% 0, 0 0, 100% 100%);
+    }
+
+    .agenda .content,
+    .chapter .content,
+    .framework .content,
+    .results .content,
+    .summary .content {
+      position: absolute;
+      left: 42px;
+      right: 42px;
+      top: 74px;
+      bottom: 42px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      margin-bottom: 18px;
+    }
+
+    .agenda-list {
+      display: grid;
+      gap: 11px;
+      margin-top: 8px;
+    }
+
+    .agenda-item {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--line);
+    }
+
+    .num {
+      width: 30px;
+      height: 30px;
+      background: var(--navy);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .agenda-item span:last-child {
+      font-size: 14px;
+      color: #263241;
+      font-weight: 600;
+    }
+
+    .chapter {
+      background:
+        linear-gradient(90deg, rgba(12, 47, 92, 0.065), transparent 44%),
+        #fff;
+    }
+
+    .chapter .content {
+      top: 86px;
+      display: grid;
+      grid-template-columns: 138px 1fr;
+      align-items: center;
+      column-gap: 26px;
+    }
+
+    .chapter .big-num {
+      font-size: 86px;
+      line-height: 1;
+      color: var(--navy);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .chapter h2 {
+      font-size: 25px;
+      margin: 0;
+      color: var(--navy);
+    }
+
+    .chapter .desc {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .framework .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: stretch;
+      gap: 12px;
+      margin-top: 22px;
+      position: relative;
+    }
+
+    .framework .node {
+      min-height: 84px;
+      border: 1px solid #c9d4e3;
+      background: #fff;
+      padding: 14px 10px;
+      position: relative;
+    }
+
+    .framework .node::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      width: 12px;
+      height: 1px;
+      background: var(--red);
+    }
+
+    .framework .node:last-child::after { display: none; }
+
+    .framework .node strong {
+      color: var(--navy);
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .framework .node p {
+      margin: 0;
+      font-size: 10px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .framework .caption {
+      margin-top: 18px;
+      font-size: 11px;
+      color: #64748b;
+      border-left: 3px solid var(--red);
+      padding-left: 10px;
+    }
+
+    .results .content {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+
+    .chart-card,
+    .metric-grid,
+    .summary-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--line);
+    }
+
+    .chart-card {
+      padding: 18px 18px 14px;
+    }
+
+    .chart-title {
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .bars {
+      height: 108px;
+      display: flex;
+      align-items: end;
+      gap: 24px;
+      padding: 0 12px 0 8px;
+      border-bottom: 1px solid #aab4c1;
+      border-left: 1px solid #aab4c1;
+    }
+
+    .bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: end;
+      height: 100%;
+      gap: 5px;
+    }
+
+    .bar {
+      width: 34px;
+      background: var(--navy);
+      position: relative;
+    }
+
+    .bar.red { background: var(--red); }
+    .bar.gray { background: #7b8794; }
+
+    .bar-label {
+      font-size: 9px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .metric {
+      padding: 12px 12px 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      min-height: 68px;
+    }
+
+    .metric .value {
+      color: var(--red);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 5px;
+    }
+
+    .summary .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .summary-card {
+      padding: 16px 13px;
+      min-height: 118px;
+      position: relative;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--red);
+    }
+
+    .summary-card strong {
+      color: var(--navy);
+      font-size: 14px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .summary-card p {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .single .header {
+      left: 94px;
+      right: 94px;
+      top: 64px;
+      height: 82px;
+      padding-bottom: 22px;
+    }
+
+    .single .header .logo {
+      width: 300px;
+      height: 70px;
+    }
+
+    .single .header .meta {
+      font-size: 22px;
+    }
+
+    .single .footer {
+      left: 94px;
+      right: 94px;
+      bottom: 56px;
+      height: 34px;
+      font-size: 18px;
+    }
+
+    .single .cover .brand {
+      top: 76px;
+      left: 102px;
+      gap: 28px;
+    }
+
+    .single .cover .brand .logo {
+      width: 432px;
+      height: 104px;
+    }
+
+    .single .cover .tag {
+      font-size: 22px;
+      border-left-width: 4px;
+      padding-left: 22px;
+    }
+
+    .single .cover .main-title {
+      left: 166px;
+      top: 340px;
+      width: 1050px;
+    }
+
+    .single .cover h1 {
+      font-size: 58px;
+      line-height: 1.28;
+    }
+
+    .single .cover .subtitle {
+      margin-top: 36px;
+      width: 710px;
+      font-size: 27px;
+      border-top-width: 2px;
+      padding-top: 26px;
+    }
+
+    .single .cover .corner {
+      width: 380px;
+      height: 380px;
+    }
+
+    .single .motif {
+      right: 66px;
+      bottom: 66px;
+      width: 620px;
+      height: 410px;
+    }
+
+    .single .agenda .content,
+    .single .chapter .content,
+    .single .framework .content,
+    .single .results .content,
+    .single .summary .content {
+      left: 128px;
+      right: 128px;
+      top: 230px;
+      bottom: 130px;
+    }
+
+    .single .page-title {
+      font-size: 50px;
+      margin-bottom: 44px;
+    }
+
+    .single .thin-red {
+      width: 160px;
+      height: 7px;
+      margin-top: 22px;
+    }
+
+    .single .agenda-list { gap: 28px; }
+
+    .single .agenda-item {
+      grid-template-columns: 82px 1fr;
+      gap: 30px;
+      padding: 23px 30px;
+      border-width: 2px;
+    }
+
+    .single .num {
+      width: 68px;
+      height: 68px;
+      font-size: 29px;
+    }
+
+    .single .agenda-item span:last-child {
+      font-size: 31px;
+    }
+
+    .single .chapter .content {
+      top: 270px;
+      grid-template-columns: 360px 1fr;
+      column-gap: 66px;
+    }
+
+    .single .chapter .big-num {
+      font-size: 226px;
+    }
+
+    .single .chapter h2 {
+      font-size: 58px;
+    }
+
+    .single .chapter .desc {
+      margin-top: 30px;
+      font-size: 28px;
+    }
+
+    .single .framework .flow {
+      gap: 30px;
+      margin-top: 54px;
+    }
+
+    .single .framework .node {
+      min-height: 220px;
+      padding: 36px 26px;
+      border-width: 2px;
+    }
+
+    .single .framework .node::after {
+      right: -30px;
+      width: 30px;
+      height: 2px;
+    }
+
+    .single .framework .node strong {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+
+    .single .framework .node p {
+      font-size: 21px;
+      line-height: 1.6;
+    }
+
+    .single .framework .caption {
+      margin-top: 46px;
+      font-size: 25px;
+      border-left-width: 7px;
+      padding-left: 24px;
+    }
+
+    .single .results .content {
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 44px;
+    }
+
+    .single .chart-card {
+      padding: 44px 44px 34px;
+      border-width: 2px;
+    }
+
+    .single .chart-title {
+      font-size: 29px;
+      margin-bottom: 34px;
+    }
+
+    .single .bars {
+      height: 285px;
+      gap: 64px;
+      padding: 0 32px 0 20px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .single .bar { width: 82px; }
+
+    .single .bar-label {
+      font-size: 20px;
+    }
+
+    .single .metrics {
+      gap: 24px;
+    }
+
+    .single .metric {
+      padding: 32px 28px 24px;
+      min-height: 172px;
+      border-width: 2px;
+    }
+
+    .single .metric .value {
+      font-size: 46px;
+    }
+
+    .single .metric .label {
+      font-size: 22px;
+      margin-top: 12px;
+    }
+
+    .single .summary .cards {
+      gap: 30px;
+      margin-top: 42px;
+    }
+
+    .single .summary-card {
+      padding: 42px 34px;
+      min-height: 320px;
+      border-width: 2px;
+    }
+
+    .single .summary-card::before {
+      width: 9px;
+    }
+
+    .single .summary-card strong {
+      font-size: 30px;
+      margin-bottom: 24px;
+    }
+
+    .single .summary-card p {
+      font-size: 22px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <section class="slide cover" data-name="cover">
+      <div class="corner"></div>
+      <div class="brand">
+        <img class="logo" src="jxust-logo-cropped.png" alt="江西理工大学">
+        <div class="tag">本科毕业设计答辩<br>信息工程学院</div>
+      </div>
+      <div class="main-title">
+        <div class="eyebrow">THESIS DEFENSE</div>
+        <h1>基于集群的多任务协同态势感知平台</h1>
+        <div class="thin-red"></div>
+        <div class="subtitle">学生：贺小双　指导教师：陈益杉<br>专业：计算机科学与技术</div>
+      </div>
+      <div class="motif"></div>
+    </section>
+
+    <section class="slide agenda" data-name="agenda">
+      <div class="header">
+        <img class="logo" src="jxust-logo-cropped.png" alt="江西理工大学">
+        <div class="meta">本科毕业设计答辩</div>
+      </div>
+      <div class="content">
+        <h2 class="title page-title">目录</h2>
+        <div class="thin-red"></div>
+        <div class="agenda-list">
+          <div class="agenda-item"><span class="num">01</span><span>研究背景与问题</span></div>
+          <div class="agenda-item"><span class="num">02</span><span>方法设计与系统实现</span></div>
+          <div class="agenda-item"><span class="num">03</span><span>实验结果与分析</span></div>
+          <div class="agenda-item"><span class="num">04</span><span>创新点与不足</span></div>
+          <div class="agenda-item"><span class="num">05</span><span>总结与展望</span></div>
+        </div>
+      </div>
+      <div class="footer"><span>JXUST Thesis Defense</span><span>02</span></div>
+    </section>
+
+    <section class="slide chapter" data-name="chapter">
+      <div class="header">
+        <img class="logo" src="jxust-logo-cropped.png" alt="江西理工大学">
+        <div class="meta">章节过渡页</div>
+      </div>
+      <div class="content">
+        <div class="big-num">01</div>
+        <div>
+          <div class="eyebrow">CHAPTER</div>
+          <h2>第一章 研究背景</h2>
+          <div class="thin-red"></div>
+          <p class="desc">从无人机集群应用需求出发，说明复杂环境下多任务协同态势感知的研究价值。</p>
+        </div>
+      </div>
+      <div class="motif"></div>
+      <div class="footer"><span>基于集群的多任务协同态势感知平台</span><span>03</span></div>
+    </section>
+
+    <section class="slide framework" data-name="framework">
+      <div class="header">
+        <img class="logo" src="jxust-logo-cropped.png" alt="江西理工大学">
+        <div class="meta">研究方法</div>
+      </div>
+      <div class="content">
+        <h2 class="title page-title">研究框架</h2>
+        <div class="thin-red"></div>
+        <div class="flow">
+          <div class="node"><strong>场景建模</strong><p>无人机、目标、障碍、天气、通信约束</p></div>
+          <div class="node"><strong>RADS调度</strong><p>目标需求、节点能力、动态子群选择</p></div>
+          <div class="node"><strong>感知融合</strong><p>观测生成、链路传输、稳健加权融合</p></div>
+          <div class="node"><strong>三维展示</strong><p>态势沙盘、回放控制、任务级联动</p></div>
+          <div class="node"><strong>实验评价</strong><p>成功率、误差、能耗、派机规模</p></div>
+        </div>
+        <div class="caption">技术路线：复杂环境建模 - 动态调度 - 协同感知 - 可视化验证。</div>
+      </div>
+      <div class="footer"><span>方法设计</span><span>04</span></div>
+    </section>
+
+    <section class="slide results" data-name="results">
+      <div class="header">
+        <img class="logo" src="jxust-logo-cropped.png" alt="江西理工大学">
+        <div class="meta">实验结果</div>
+      </div>
+      <div class="content">
+        <div class="chart-card">
+          <h2 class="title page-title" style="font-size:20px;margin-bottom:6px;">实验结果分析</h2>
+          <div class="chart-title">三策略严格成功率对比</div>
+          <div class="bars">
+            <div class="bar-wrap"><div class="bar" style="height:78%;"></div><div class="bar-label">RADS</div></div>
+            <div class="bar-wrap"><div class="bar red" style="height:22%;"></div><div class="bar-label">随机派遣</div></div>
+            <div class="bar-wrap"><div class="bar gray" style="height:84%;"></div><div class="bar-label">全量派遣</div></div>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="value">70.8%</div><div class="label">默认场景 RADS 严格成功率</div></div>
+          <div class="metric"><div class="value">47.6%</div><div class="label">相较全量派遣能耗降低</div></div>
+          <div class="metric"><div class="value">9.52m</div><div class="label">默认场景平均定位误差</div></div>
+          <div class="metric"><div class="value">9.4</div><div class="label">默认场景平均派机数量</div></div>
+        </div>
+      </div>
+      <div class="footer"><span>结果分析</span><span>05</span></div>
+    </section>
+
+    <section class="slide summary" data-name="summary">
+      <div class="header">
+        <img class="logo" src="jxust-logo-cropped.png" alt="江西理工大学">
+        <div class="meta">总结与展望</div>
+      </div>
+      <div class="content">
+        <h2 class="title page-title">总结与展望</h2>
+        <div class="thin-red"></div>
+        <div class="cards">
+          <div class="summary-card"><strong>研究总结</strong><p>完成复杂环境下无人机集群协同态势感知平台。</p></div>
+          <div class="summary-card"><strong>创新点</strong><p>提出 RADS 动态子群选择，并建立三策略对比机制。</p></div>
+          <div class="summary-card"><strong>不足</strong><p>仍属于论文级仿真，参数权重需要更多场景校准。</p></div>
+          <div class="summary-card"><strong>展望</strong><p>后续可拓展高保真仿真、批量实验和 ROS/PX4 对接。</p></div>
+        </div>
+      </div>
+      <div class="footer"><span>谢谢各位老师，请批评指正</span><span>06</span></div>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const slide = params.get("slide");
+    if (slide) {
+      document.body.classList.add("single");
+      document.body.dataset.slide = slide;
+    }
+  </script>
+</body>
+</html>

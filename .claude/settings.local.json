@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\biushe\" -Depth 2)",
+      "Bash(Select-Object Mode, Name)"
+    ]
+  }
+}
